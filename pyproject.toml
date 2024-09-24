@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "o1graph"
+version = "0.1.0"
+description = "Using langgraph to create o1-like reasoning chains"
+authors = ["Frank Lin <etrobot@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langgraph = "^0.2.14"
+python-dotenv = "^1.0.1"
+langchain-openai = "^0.1.23"
+langgraph-checkpoint-sqlite = "^1.0.3"
+shortuuid = "^1.0.13"
+aiosqlite = "^0.20.0"
+streamlit = "^1.38.0"
+streamlit-mermaid = "^0.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

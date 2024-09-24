@@ -1,0 +1,9 @@
+# Python 3.10 or higher
+langgraph==0.2.14
+python-dotenv==1.0.1
+langchain-openai==0.1.23
+langgraph-checkpoint-sqlite==1.0.3
+shortuuid==1.0.13
+aiosqlite==0.20.0
+streamlit==1.38.0
+streamlit-mermaid==0.2.0
