@@ -116,7 +116,7 @@ def generate_response_graph():
     graph.add_node("generate_final_answer", generate_final_answer)
 
     graph.add_edge(START, "initialize")
-    graph.add_conditional_edges("initialize", should_continue)
+    graph.add_edge("initialize", "process_step")
     graph.add_conditional_edges("process_step", should_continue)
     graph.add_edge("generate_final_answer", END)
 

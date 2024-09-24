@@ -23,7 +23,7 @@ def main():
         __start__ --> initialize;
         generate_final_answer --> __end__;
         initialize -.-> process_step;
-        generate_final_answer -.-> process_step;
+        process_step -.-> process_step;
         process_step -.-> generate_final_answer;
         
         style {current_node} stroke:#23b883,stroke-width:8px
@@ -47,7 +47,7 @@ def main():
     update_mermaid("__start__")
 
     # Text input for user query
-    user_query = st.text_input("Enter your query:", placeholder="For example, how many 'R's are in the word 'strawberry'?")
+    user_query = st.text_input("Enter your query:", placeholder="For example, how many 'r's are in the word 'strawberry'?")
     
     if user_query:
         st.write("Generating response...")
