@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Annotated, TypedDict
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
@@ -32,6 +31,14 @@ llm = ChatOpenAI(
     base_url=os.getenv("BASE_URL", "https://api.openai.com/v1"),
 ).with_structured_output(ResponseFormat)
 
+# If your model provider doesn't support structured output, you can use the following code:
+# llm = ChatOpenAI(
+#     model=os.getenv("MODEL", "gpt-4o-mini"),
+#     api_key=os.getenv("OPENAI_KEY"),
+#     base_url=os.getenv("BASE_URL", "https://api.openai.com/v1"),
+# ).bind(
+#     response_format={"type": "json_object"}
+# )
 
 def make_api_call(message, max_tokens, is_final_answer=False):
     messages = [
@@ -64,6 +71,8 @@ USE BEST PRACTICES.
                     input=messages,
                     temperature=0.4,
                 )
+                # If your model provider doesn't support structured output, you can use the following code:
+                # return json.loads(response.content)
                 return response.model_dump()
             else:
                 response = llm.invoke(
@@ -71,6 +80,8 @@ USE BEST PRACTICES.
                     max_tokens=max_tokens,
                     temperature=0.8,
                 )
+                # If your model provider doesn't support structured output, you can use the following code:
+                # return json.loads(response.content)
                 return response.model_dump()
         except Exception as e:
             if attempt == 2:
@@ -155,8 +166,6 @@ def generate_response_graph():
 
     return graph.compile()
 
-
-# 使用示例
 if __name__ == "__main__":
     app = generate_response_graph()
     print(app.get_graph().draw_mermaid())
