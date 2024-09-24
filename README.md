@@ -5,20 +5,9 @@ This is an early prototype of using prompting to create o1-like reasoning chains
 
 Inspired by the [groq-g1 project](https://github.com/bklieger-groq/g1).
 
-### Flow
 
-graph TD;
-        __start__([<p>__start__</p>]):::first
-        initialize(initialize)
-        process_step(process_step)
-        generate_final_answer(generate_final_answer)
-        __end__([<p>__end__</p>]):::last
-        __start__ --> initialize;
-        generate_final_answer --> __end__;
-        initialize -.-> process_step;
-        generate_final_answer -.-> process_step;
-        process_step -.-> generate_final_answer;
 
+https://github.com/user-attachments/assets/bd03cfa0-c530-4e64-9ee1-f4e29a5cd7ea
 
 ### Quickstart
 ~~~
