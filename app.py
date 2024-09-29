@@ -18,14 +18,13 @@ def main():
         __start__([<p>__start__</p>])
         initialize(Initialize)
         process_step(Process Step)
-        generate_final_answer(Generate Final Answer)
+        condition_node(Final Answer or Loop)
         __end__([<p>__end__</p>])
         __start__ --> initialize;
-        generate_final_answer --> __end__;
+        condition_node --> __end__;
         initialize -.-> process_step;
-        process_step -.-> process_step;
-        process_step -.-> generate_final_answer;
-        
+        process_step -.-> condition_node;
+        condition_node -.-> process_step;
         style {current_node} stroke:#23b883,stroke-width:8px
     """
 
@@ -40,8 +39,9 @@ def main():
     def update_mermaid(current_node):
         mermaid_code = mermaid_base.format(current_node=current_node)
         with sidebar_mermaid:
-            st.session_state.mermaid_counter += 1
             stmd.st_mermaid(mermaid_code, height="500px", key=f"mermaid_{st.session_state.mermaid_counter}")
+            st.session_state.mermaid_counter += 1
+
 
     # Initial state
     update_mermaid("__start__")
@@ -60,19 +60,18 @@ def main():
         app = generate_response_graph()
         for result in app.stream({"message": user_query}):
             current_node = list(result.keys())[0]
-            update_mermaid(current_node)
-            
             with response_container.container():
                 if 'initialize' in result:
                     continue
                 elif 'process_step' in result:
+                    update_mermaid(current_node)
                     steps = result['process_step']['steps']
                     for step in steps:
                         title, content, thinking_time = step
                         with st.expander(f"{title} ({thinking_time:.2f} seconds)", expanded=True):
                             st.markdown(content, unsafe_allow_html=True)
-                elif 'generate_final_answer' in result:
-                    steps = result['generate_final_answer']['steps']
+                elif 'condition_node' in result and 'Final Answer' in result['condition_node']['steps'][-1]:
+                    steps = result['condition_node']['steps']
                     for step in steps:
                         title, content, thinking_time = step
                         with st.expander(f"{title} ({thinking_time:.2f} seconds)", expanded=True):
@@ -81,8 +80,9 @@ def main():
                     st.markdown(f"### Final Answer")
                     content = final_step[1]
                     st.markdown(str(content), unsafe_allow_html=True)
-                    total_thinking_time = result['generate_final_answer']['total_thinking_time']
+                    total_thinking_time = result['condition_node']['total_thinking_time']
                     time_container.markdown(f"**Total thinking time: {total_thinking_time:.2f} seconds**")
+
         update_mermaid("__end__")
 
 if __name__ == "__main__":

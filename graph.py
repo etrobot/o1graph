@@ -10,7 +10,6 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-
 class State(TypedDict):
     message: str
     steps: list
@@ -19,12 +18,10 @@ class State(TypedDict):
     is_final_answer: bool
 
 
-class ResponseFormat(BaseModel):
-    title: str = Field(..., description="Title of the reasoning step")
-    content: str = Field(..., description="Content of the reasoning step")
-    next_action: str = Field(..., description="Next action to take after this step")
-
-
+# class ResponseFormat(BaseModel):
+#     title: str = Field(..., description="Title of the reasoning step")
+#     content: str = Field(..., description="Content of the reasoning step")
+#     next_action: str = Field(..., description="Next action to take after this step")
 # llm = ChatOpenAI(
 #     model=os.getenv("MODEL", "gpt-4o-mini"),
 #     api_key=os.getenv("OPENAI_KEY"),
@@ -132,7 +129,10 @@ def generate_response_graph():
             or state["step_count"] >= os.getenv("MAX_STEPS", 10),
         }
 
-    def generate_final_answer(state: State):
+    def condition_node(state: State):
+        if not state["is_final_answer"]:
+            return state
+        
         message = (
             state["message"]
             + "Please provide the final answer based solely on your reasoning above. Do not use JSON formatting. Only provide the text response without any titles or preambles. Retain any formatting as instructed by the original prompt, such as exact formatting for free response or multiple choice."
@@ -152,17 +152,18 @@ def generate_response_graph():
 
     def should_continue(state: State):
         return (
-            "process_step" if not state["is_final_answer"] else "generate_final_answer"
+            "process_step" if not state["is_final_answer"] else END
         )
 
     graph.add_node("initialize", initialize_state)
     graph.add_node("process_step", process_step)
-    graph.add_node("generate_final_answer", generate_final_answer)
+    graph.add_node("condition_node", condition_node)
 
     graph.add_edge(START, "initialize")
     graph.add_edge("initialize", "process_step")
-    graph.add_conditional_edges("process_step", should_continue)
-    graph.add_edge("generate_final_answer", END)
+    graph.add_edge("process_step", "condition_node")
+    graph.add_conditional_edges("condition_node", should_continue)
+    graph.add_edge("condition_node", END)
 
     return graph.compile()
 
